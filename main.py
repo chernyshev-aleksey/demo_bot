@@ -3,9 +3,10 @@ from telebot import custom_filters
 from telebot import StateMemoryStorage
 from telebot.handler_backends import StatesGroup, State
 
+
 state_storage = StateMemoryStorage()
 bot = telebot.TeleBot("6081275728:AAEWUtyKA63RDFQPxI8QScXkLeUi-1N3fvk",
-                      state_storage=state_storage)
+                      state_storage=state_storage, parse_mode='Markdown')
 
 
 class PollState(StatesGroup):
@@ -18,15 +19,30 @@ class HelpState(StatesGroup):
     wait_text = State()
 
 
+text_poll = "опрос"
+text_button_1 = "Кнопка 1"
+text_button_2 = "Кнопка 2"
+text_button_3 = "Кнопка 3"
+
+
 menu_keyboard = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
 menu_keyboard.add(
     telebot.types.KeyboardButton(
-        "опрос",
+        text_poll,
     )
 )
 menu_keyboard.add(
     telebot.types.KeyboardButton(
-        "помощь",
+        text_button_1,
+    )
+)
+
+menu_keyboard.add(
+    telebot.types.KeyboardButton(
+        text_button_2,
+    ),
+    telebot.types.KeyboardButton(
+        text_button_3,
     )
 )
 
@@ -40,9 +56,9 @@ def start_ex(message):
     bot.set_state(message.from_user.id, PollState.first, message.chat.id)
 
 
-@bot.message_handler(func=lambda message: "опрос" == message.text, state=PollState.first)
+@bot.message_handler(func=lambda message: text_poll == message.text, state=PollState.first)
 def first(message):
-    bot.send_message(message.chat.id, 'Супер! Ваше имя?')
+    bot.send_message(message.chat.id, 'Супер! *Ваше* _имя_?')
     bot.set_state(message.from_user.id, PollState.name, message.chat.id)
 
 
@@ -50,7 +66,7 @@ def first(message):
 def name(message):
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['name'] = message.text
-    bot.send_message(message.chat.id, 'Супер! Ваш возраст?')
+    bot.send_message(message.chat.id, 'Супер! [Ваш](https://www.example.com/) `возраст?`')
     bot.set_state(message.from_user.id, PollState.age, message.chat.id)
 
 
@@ -68,16 +84,19 @@ def age(message):
     bot.delete_state(message.from_user.id, message.chat.id)
 
 
-@bot.message_handler(func=lambda message: "помощь" == message.text)
+@bot.message_handler(func=lambda message: text_button_1 == message.text)
 def help_command(message):
-    bot.send_message(message.chat.id, "Напишите, пожалуйста, своё сообщение и мы передадим его администратору")
-    bot.set_state(message.from_user.id, HelpState.wait_text, message.chat.id)
+    bot.send_message(message.chat.id, "Текст 1")
 
 
-@bot.message_handler(state=HelpState.wait_text)
-def wait_help_text(message):
-    bot.send_message(message.chat.id, "Спасибо за обратную связь!", reply_markup=menu_keyboard)
-    bot.set_state(message.from_user.id, HelpState.wait_text, message.chat.id)
+@bot.message_handler(func=lambda message: text_button_2 == message.text)
+def help_command(message):
+    bot.send_message(message.chat.id, "Текст 2")
+
+
+@bot.message_handler(func=lambda message: text_button_3 == message.text)
+def help_command(message):
+    bot.send_message(message.chat.id, "Текст 3")
 
 
 bot.add_custom_filter(custom_filters.StateFilter(bot))
