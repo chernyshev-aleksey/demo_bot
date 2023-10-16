@@ -86,17 +86,17 @@ def age(message):
 
 @bot.message_handler(func=lambda message: text_button_1 == message.text)
 def help_command(message):
-    bot.send_message(message.chat.id, "Текст 1")
+    bot.send_message(message.chat.id, "Текст 1", reply_markup=menu_keyboard)
 
 
 @bot.message_handler(func=lambda message: text_button_2 == message.text)
 def help_command(message):
-    bot.send_message(message.chat.id, "Текст 2")
+    bot.send_message(message.chat.id, "Текст 2", reply_markup=menu_keyboard)
 
 
 @bot.message_handler(func=lambda message: text_button_3 == message.text)
 def help_command(message):
-    bot.send_message(message.chat.id, "Текст 3")
+    bot.send_message(message.chat.id, "Текст 3", reply_markup=menu_keyboard)
 
 
 bot.add_custom_filter(custom_filters.StateFilter(bot))
